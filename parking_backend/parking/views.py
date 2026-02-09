@@ -5,6 +5,80 @@ from django.shortcuts import get_object_or_404
 from .models import Reservation, MonthlyPass, YearlyPass
 from .serializers import ReservationSerializer, MonthlyPassSerializer, YearlyPassSerializer, EmployeeSerializer
 from .qr import generate_qr
+import random
+from django.core.mail import send_mail
+
+from django.utils import timezone
+from django.conf import settings
+import os
+from deepface import DeepFace
+
+@api_view(['POST'])
+def verify_face(request):
+    try:
+        # 1. Get uploaded image
+        uploaded_file = request.FILES.get('image')
+        if not uploaded_file:
+            return Response({'error': 'No image provided'}, status=400)
+
+        # 2. Save uploaded image temporarily
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        temp_path = os.path.join(temp_dir, uploaded_file.name)
+        with open(temp_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
+
+        # 3. Ensure DB path exists
+        db_path = os.path.join(settings.MEDIA_ROOT, 'employee_faces')
+        if not os.path.exists(db_path):
+             return Response({'error': 'No registered faces found in database.'}, status=404)
+
+        try:
+            # 4. Perform Face Verification (Find match in DB)
+            # using VGG-Face model by default, it's good.
+            # enforce_detection=False allows processing even if face detection is tricky, but True is safer.
+            dfs = DeepFace.find(img_path=temp_path, db_path=db_path, enforce_detection=False, silent=True)
+            
+            # DeepFace.find returns a list of dataframes
+            if len(dfs) > 0 and len(dfs[0]) > 0:
+                matched_df = dfs[0]
+                # Get the first match
+                result_path = matched_df.iloc[0]['identity']
+                
+                # Extract filename to find employee
+                # result_path is absolute, e.g., /media/employee_faces/img.jpg
+                filename = os.path.basename(result_path)
+                
+                # Find Employee
+                # We search by profile_pic path ending with this filename
+                employee = Employee.objects.filter(profile_pic__icontains=filename).first()
+                
+                if employee:
+                    # Clean up temp
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
+                        
+                    return Response({
+                        'success': True,
+                        'employee': EmployeeSerializer(employee).data
+                    })
+
+            # Clean up temp
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+                
+            return Response({'error': 'Face not recognized'}, status=401)
+
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            # Deepface specific errors
+            return Response({'error': f"Verification failed: {str(e)}"}, status=500)
+        
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
 
 @api_view(['POST'])
 def create_reservation(request):
@@ -115,5 +189,5 @@ def create_employee(request):
     serializer = EmployeeSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

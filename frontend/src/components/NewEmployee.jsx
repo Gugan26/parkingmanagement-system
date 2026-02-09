@@ -1,21 +1,21 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  User, Mail, Hash, ArrowLeft, CheckCircle, 
-  ChevronRight, Phone, Fingerprint, Loader2, Camera, VideoOff 
+import {
+  User, Mail, Hash, ArrowLeft, CheckCircle,
+  ChevronRight, Phone, Fingerprint, Loader2, Camera, VideoOff
 } from "lucide-react";
 
 export default function NewEmployee() {
   const navigate = useNavigate();
   const videoRef = useRef(null);
-  
+
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [stream, setStream] = useState(null);
-  
+
   // Photo capture pannurathukana States
-  const [photo, setPhoto] = useState(null); 
+  const [photo, setPhoto] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -56,7 +56,7 @@ export default function NewEmployee() {
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(videoRef.current, 0, 0);
-      
+
       canvas.toBlob((blob) => {
         setPhoto(blob); // Database-ku anupa (File)
         setPreviewUrl(URL.createObjectURL(blob)); // UI-la preview kaata
@@ -76,7 +76,7 @@ export default function NewEmployee() {
     stopWebcam();
     setStep((p) => p + 1);
   };
-  
+
   const prevStep = () => {
     stopWebcam();
     setStep((p) => p - 1);
@@ -99,7 +99,7 @@ export default function NewEmployee() {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/api/new-employee/", {
+      const response = await fetch("http://127.0.0.1:8000/api/new-employee/", {
         method: "POST",
         // Note: Content-Type header poda koodathu
         body: data,
@@ -125,12 +125,12 @@ export default function NewEmployee() {
   return (
     <div className="min-h-screen bg-gray-100 p-4 flex justify-center items-center font-sans">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={neumorphicCard}>
-        
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <button 
+          <button
             type="button"
-            onClick={() => step > 1 ? prevStep() : navigate(-1)} 
+            onClick={() => step > 1 ? prevStep() : navigate(-1)}
             className="p-2.5 rounded-xl bg-gray-100 shadow-[4px_4px_10px_#b8b9be,-4px_-4px_10px_#ffffff] hover:text-yellow-600 active:shadow-inner transition-all"
           >
             <ArrowLeft size={18} />
@@ -154,20 +154,20 @@ export default function NewEmployee() {
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-4">
                 <div>
-                  <label className={labelStyle}><User size={12}/> Name</label>
+                  <label className={labelStyle}><User size={12} /> Name</label>
                   <input name="name" value={formData.name} onChange={handleChange} placeholder="John Doe" required className={inputStyle} />
                 </div>
                 <div>
-                  <label className={labelStyle}><Mail size={12}/> Email</label>
+                  <label className={labelStyle}><Mail size={12} /> Email</label>
                   <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john@company.com" required className={inputStyle} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelStyle}><Phone size={12}/> Phone</label>
+                    <label className={labelStyle}><Phone size={12} /> Phone</label>
                     <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="987..." required className={inputStyle} />
                   </div>
                   <div>
-                    <label className={labelStyle}><Fingerprint size={12}/> Adhar Number</label>
+                    <label className={labelStyle}><Fingerprint size={12} /> Adhar Number</label>
                     <input name="employee_id" value={formData.employee_id} onChange={handleChange} placeholder="E-01" required className={inputStyle} />
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export default function NewEmployee() {
             {/* STEP 2: Identity Verification (Corrected with Capture) */}
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-4">
-                <label className={labelStyle}><Camera size={12}/> Identity Scan</label>
+                <label className={labelStyle}><Camera size={12} /> Identity Scan</label>
                 <div className="relative overflow-hidden rounded-2xl bg-black aspect-video flex items-center justify-center border-4 border-white shadow-inner">
                   {previewUrl ? (
                     <img src={previewUrl} className="w-full h-full object-cover" alt="Captured" />
@@ -196,7 +196,7 @@ export default function NewEmployee() {
                   )}
                   {stream && <div className="absolute inset-0 border-2 border-dashed border-yellow-400/30 rounded-2xl animate-pulse" />}
                 </div>
-                
+
                 <div className="flex gap-3">
                   {!stream && !previewUrl ? (
                     <button type="button" onClick={startWebcam} className="flex-1 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold flex items-center justify-center gap-2 shadow-sm">
@@ -213,9 +213,9 @@ export default function NewEmployee() {
                   )}
                 </div>
 
-                <button 
-                  type="button" 
-                  onClick={nextStep} 
+                <button
+                  type="button"
+                  onClick={nextStep}
                   className="w-full py-3.5 mt-2 rounded-xl bg-gray-800 text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
                 >
                   Confirm & Continue <ChevronRight size={16} />
@@ -231,10 +231,10 @@ export default function NewEmployee() {
                   <input type="number" name="age" value={formData.age} onChange={handleChange} placeholder="25" required className={inputStyle} />
                 </div>
                 <div>
-                  <label className={labelStyle}><Hash size={12}/> Vehicle No.</label>
+                  <label className={labelStyle}><Hash size={12} /> Vehicle No.</label>
                   <input name="vehicle_number" value={formData.vehicle_number} onChange={handleChange} placeholder="TN 01 AB..." required className={inputStyle} />
                 </div>
-                
+
                 <div className="pt-2">
                   <button
                     disabled={loading}

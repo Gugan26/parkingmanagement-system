@@ -7,7 +7,8 @@ from .views import (
     cancel_reservation, 
     create_employee,
     mark_as_scanned,      # Itha add panniten
-    check_scan_status     # Ithayum add panniten
+    check_scan_status,     # Ithayum add panniten
+    verify_face
 )
 
 urlpatterns = [
@@ -16,6 +17,7 @@ urlpatterns = [
     path("yearly-pass/", create_yearly_pass, name="yearly-pass"),
     path("cancel-reservation/", cancel_reservation, name="cancel-reservation"),
     path("new-employee/", create_employee, name='create_employee'),
+    path("verify-face/", verify_face, name='verify_face'),
     
     # Prefix-a remove panniyachu, ഏன்னா main file-laye 'api/' irukku
     path('mark_as_scanned/<str:spot_id>/', mark_as_scanned, name='mark_as_scanned'),

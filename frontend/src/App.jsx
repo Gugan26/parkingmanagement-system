@@ -22,12 +22,12 @@ export default function App() {
           <Route path="/monthly-pass" element={<MonthlyPassForm />} />
           <Route path="/yearly-pass" element={<YearlyPassForm />} />
 
-          {/* Authentication Step: Face Scan */}
+          {/* Authentication Step: Face Recognition */}
           <Route path="/existing-face" element={<ExistingFace />} />
 
           {/* Final Destination: Parking Dashboard */}
           <Route path="/dashboard" element={<ParkingDashboard />} />
-          
+
           {/* Oru velai route thappa iruntha, home page-ku redirect panna: */}
           <Route path="*" element={<BranchSelection />} />
         </Routes>

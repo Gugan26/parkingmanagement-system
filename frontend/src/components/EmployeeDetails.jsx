@@ -11,9 +11,9 @@ import {
 // Components
 import { ParkingDashboard } from "./ParkingDashboard";
 import NewEmployee from "./NewEmployee";
-import Visitor from "./Visitor"; 
+import Visitor from "./Visitor";
 // Import ExistingFace correctly here
-import ExistingFace from "./ExistingFace.jsx"; 
+import ExistingFace from "./ExistingFace";
 
 export function EmployeeDetails() {
   const [view, setView] = useState("dashboard");
