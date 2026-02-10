@@ -108,7 +108,11 @@ export default function NewEmployee() {
       if (response.ok) {
         navigate("/dashboard");
       } else {
-        alert("Submission failed");
+        const errorData = await response.json();
+        const errorMessage = Object.entries(errorData)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("\n");
+        alert("Submission failed:\n" + errorMessage);
       }
     } catch (error) {
       alert("Server error!");

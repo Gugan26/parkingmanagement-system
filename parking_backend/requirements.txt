@@ -2,3 +2,8 @@ Django==4.2.11
 gunicorn
 djangorestframework
 django-cors-headers
+tf-keras
+deepface==0.0.98
+tensorflow==2.20.0
+numpy
+opencv-python==4.10.0.84
